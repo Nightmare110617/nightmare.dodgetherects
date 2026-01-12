@@ -1,0 +1,656 @@
+var gameState = "start";
+var millisAtStart = 0;
+var duration = 0;
+var record = {
+    Easy: 0,
+    Medium: 0,
+    Hard: 0,
+    Impossible: 0,
+    };
+var textX = 1;
+//The main rect
+var playerRect = {
+    x: 0,
+    y: 0,
+    wh: 20,
+    speed: 15,
+}; //End of "The main rect"
+//The attacking rects
+var attackingRects = [];
+var xMin = 750;
+var xMax = 1000;
+var speedMin = -15;
+var speedMax = -5;
+var homeIcon = 352;
+var changeGameStateToPlay = function() {
+    gameState = "play";
+    millisAtStart = millis();
+    attackingRects = [];
+    while (attackingRects.length < 30) {
+        var attackingRect = {
+            x: random(xMin, xMax),
+            y: attackingRects.length * 15,
+            wh: 20,
+            speed: random(speedMin, speedMax) 
+        };
+        attackingRects.push(attackingRect);
+    }
+};    
+var difficulty = "Hard";
+var changeGameStateToEnd = function() {
+    gameState = "end";
+    duration = (millis() - millisAtStart) / 1000;
+    record[difficulty] = max(duration, record[difficulty]);
+};    
+var length = "";
+var difficult = "";
+//The button
+var mouseWasPressedInStartButton = false;
+var mouseWasMovedOverStartButton = false;
+var mouseWasPressedInRestartButton = false;
+var mouseWasMovedOverRestartButton = false;
+var colorOfRestartButton1 = 255;
+var colorOfRestartButton2 = 0;
+var mouseWasPressedInEasyButton = false;
+var mouseWasMovedOverEasyButton = false;
+var mouseWasPressedInMediumButton = false;
+var mouseWasMovedOverMediumButton = false;
+var mouseWasPressedInHardButton = false;
+var mouseWasMovedOverHardButton = false;
+var mouseWasPressedInImpossibleButton = false;
+var mouseWasMovedOverImpossibleButton = false;
+var mouseWasPressedInHomeButton = false;
+var mouseWasMovedOverHomeButton = false;
+mousePressed = function() {
+    if (gameState === "end" && mouseX > 130 && mouseX < 280 && mouseY > 296 && mouseY < 371) {       mouseWasPressedInRestartButton = true;
+    }
+
+    if (gameState === "start" && mouseX > 61 && mouseX < 361 && mouseY > 40 && mouseY < 190) {
+        mouseWasPressedInStartButton = true;
+    }
+    //The difficulty level buttons
+    if (gameState === "start" && mouseX > 61 && mouseX < 195 && mouseY > 216 && mouseY < 285) {
+        mouseWasPressedInEasyButton = true;
+    }
+    
+    if (gameState === "start" && mouseX > 228 && mouseX < 362 && mouseY > 216 && mouseY < 281) {
+        mouseWasPressedInMediumButton = true;    
+    }
+    
+    if (gameState === "start" && mouseX > 61 && mouseX < 195 && mouseY > 314 && mouseY < 379) {
+        mouseWasPressedInHardButton = true;
+    }    
+    
+    if (gameState === "start" && mouseX > 228 && mouseX < 362 && mouseY > 314 && mouseY < 379) {
+        mouseWasPressedInImpossibleButton = true;
+        
+    }
+    
+    if (gameState === "end" && mouseX > 352 && mouseX < 399 && mouseY > 0 && mouseY < 47) {
+        mouseWasPressedInHomeButton = true;
+        
+    }
+    
+};
+mouseOut = function() {
+    mouseWasPressedInHomeButton = false;
+    mouseWasMovedOverHomeButton = false;
+    mouseWasPressedInEasyButton = false;
+    mouseWasMovedOverEasyButton = false;
+    mouseWasPressedInMediumButton = false;
+    mouseWasMovedOverMediumButton = false;
+    mouseWasPressedInHardButton = false;
+    mouseWasMovedOverHardButton = false;
+    mouseWasPressedInImpossibleButton = false;
+    mouseWasMovedOverImpossibleButton = false;
+    mouseWasPressedInHomeButton = false;
+    mouseWasMovedOverHomeButton = false;
+    mouseWasPressedInStartButton = false;
+    mouseWasMovedOverStartButton = false;
+    mouseWasPressedInRestartButton = false;
+    mouseWasMovedOverRestartButton = false;
+    
+
+};
+mouseOver = function() {
+    mouseWasMovedOverHomeButton = true;
+    mouseWasMovedOverRestartButton = true;
+    mouseWasMovedOverEasyButton = true;
+    mouseWasMovedOverMediumButton = true;
+    mouseWasMovedOverHardButton = true;
+    mouseWasMovedOverImpossibleButton = true;
+    mouseWasMovedOverStartButton = true;
+};
+//For when you press the button
+mouseReleased = function () {
+    if (mouseWasPressedInRestartButton && mouseX > 130 && mouseX < 280 && mouseY > 296 && mouseY < 371) {
+        changeGameStateToPlay();
+    }
+    mouseWasPressedInRestartButton = false;
+    
+    
+    if (mouseWasPressedInStartButton && mouseX > 61 && mouseX < 361 && mouseY > 40 && mouseY < 190) {
+        changeGameStateToPlay();    
+    }
+    mouseWasPressedInStartButton = false;
+    
+    //The difficulty level buttons
+    if (mouseWasPressedInEasyButton && mouseX > 61 && mouseX < 195 && mouseY > 216 && mouseY < 285) {
+        xMin = 750;
+        xMax = 1500;
+        speedMin = -3;
+        speedMax = -7.5;
+        difficulty = "Easy";
+        playSound(getSound("rpg/metal-clink"));
+        
+    }
+    mouseWasPressedInEasyButton = false;
+    
+    if (mouseWasPressedInMediumButton && mouseX > 228 && mouseX < 362 && mouseY > 216 && mouseY < 281) {
+        xMin = 750;
+        xMax = 1500;
+        speedMin = -5;
+        speedMax = -10;
+        difficulty = "Medium";
+        playSound(getSound("rpg/hit-clop"));
+        
+    }   
+    mouseWasPressedInMediumButton = false;
+    
+    if (mouseWasPressedInHardButton && mouseX > 61 && mouseX < 195 && mouseY > 314 && mouseY < 379) {
+        xMin = 750;
+        xMax = 1000;
+        speedMin = -5;
+        speedMax = -15;
+        difficulty = "Hard";
+        playSound(getSound("rpg/giant-hyah"));
+    } 
+    mouseWasPressedInHardButton = false;
+    
+    if (mouseWasPressedInImpossibleButton && mouseX > 228 && mouseX < 362 && mouseY > 314 && mouseY < 379) {
+        xMin = 401;
+        xMax = 600;
+        speedMin = -10;
+        speedMax = -20;
+        difficulty = "Impossible";
+        playSound(getSound("rpg/giant-no"));
+        
+        
+    }
+    mouseWasPressedInImpossibleButton = false;
+    
+    //The home button
+    if (mouseWasPressedInHomeButton && mouseX > 352 && mouseX < 397 && mouseY > 1 && mouseY < 47) {
+        gameState = "start";    
+    }
+    mouseWasPressedInHomeButton = false;
+    
+};
+keyReleased = function () {
+    if (gameState === "end" && keyCode === ENTER || gameState === "start" && keyCode === ENTER) {
+        changeGameStateToPlay();
+        
+    }
+};
+var drawStart = function() {
+    // 1. The background
+    background(255, 255, 255);
+    
+    
+    
+    
+    
+    // 2. The start button
+    fill(92, 0, 252);
+    //To indicate if you can press the button
+    if (mouseWasMovedOverStartButton && mouseX > 61 && mouseX < 361 && mouseY > 40 && mouseY < 190) {
+        fill(11, 45, 140);
+    } //End of "To indicate if you can press the button"
+    if (mouseWasPressedInStartButton && mouseIsPressed && mouseX > 61 && mouseX < 361 && mouseY > 40 && mouseY < 190) {
+        fill(156, 111, 111);
+    }
+
+    
+    if (keyIsPressed && keyCode === ENTER) {
+        fill(156, 111, 111);
+    }
+    rect(61, 40, 300, 150);
+    
+    
+    
+    // 3. The button text
+    fill(0, 0, 0);
+    textSize(80);
+    text("Start", 124, 144);
+    textSize(20);
+    text("Click start or enter to begin", 92, 25);
+    textSize(15.7);
+    text("Your difficulty is " + difficulty, 124, 206);
+    
+    textSize(20);
+    // 4. The difficulty level
+    fill(255, 255, 255);
+    
+    //Easy
+    if (mouseWasMovedOverEasyButton && mouseX > 61 && mouseX < 195 && mouseY > 216 && mouseY < 285) {
+        fill(201, 189, 189);
+        
+    }
+    if (mouseWasPressedInEasyButton && mouseIsPressed && mouseX > 61 && mouseX < 195 && mouseY > 216 && mouseY < 285) {
+        fill(255, 238, 0);
+    } rect(61, 216, 134, 65);
+    fill(255, 255, 255);
+    //Medium
+    if (mouseX > 228 && mouseX < 362 && mouseY > 216 && mouseY < 281 && mouseWasMovedOverMediumButton) {
+        fill(201, 189, 189);
+        
+    }
+    if (mouseWasPressedInMediumButton && mouseIsPressed && mouseX > 228 && mouseX < 362 && mouseY > 216 && mouseY < 281) {
+        fill(51, 255, 0);
+    
+    } rect(228, 216, 134, 65);
+    fill(255, 255, 255);
+    //Hard
+    if (mouseX > 61 && mouseX < 195 && mouseY > 314 && mouseY < 379 && mouseWasMovedOverHardButton) {
+        fill(201, 189, 189);
+    
+    } 
+    if (mouseWasPressedInHardButton && mouseIsPressed && mouseX > 61 && mouseX < 195 && mouseY > 314 && mouseY < 379) {
+        fill(255, 0, 0);
+        
+    } rect(61, 314, 134, 65);
+    fill(255, 255, 255);
+    //Impossible
+    if (mouseX > 228 && mouseX < 362 && mouseY > 314 && mouseY < 379 && mouseWasMovedOverImpossibleButton) {
+        fill(201, 189, 189);
+
+    }
+    if (mouseWasPressedInImpossibleButton && mouseIsPressed && mouseX > 228 && mouseX < 362 && mouseY > 314 && mouseY < 379) {
+        fill(120, 0, 0);
+    
+    
+    } rect(228, 314, 134, 65);
+        
+    
+    fill(0, 0, 0);
+    text("Easy", 109, 254);
+    if (record.Easy > 0) {
+        textSize(15);
+        text(record.Easy, 61, 212);
+        textSize(20);
+    }
+    if (record.Medium > 0) {
+        textSize(15);
+        text(record.Medium, 317, 213);
+        textSize(20);
+    }
+    text("Medium", 261, 254);
+    if (record.Hard > 0) {
+        textSize(15);
+        text(record.Hard, 61, 310);
+        textSize(20);
+    }
+    text("Hard", 107, 351);
+    if (record.Impossible > 0) {
+        textSize(15);
+        text(record.Impossible, 325, 311);
+        textSize(20);
+    }
+    text("Impossible", 250, 351);
+    
+};
+var drawPlay = function() {
+    
+    background(0, 0, 0);
+    playSound(getSound("rpg/giant-no"));
+    
+    //The main rectanlge
+    fill(255, 0, 0);
+    rect(playerRect.x, playerRect.y, playerRect.wh, playerRect.wh);
+    
+    //To draw the attacking rects
+    fill(68, 255, 0);
+    for (var i = 0; i < attackingRects.length; i++) {
+        var attackingRect = attackingRects[i];
+        attackingRect.x += attackingRect.speed;
+        rect(attackingRect.x, attackingRect.y, attackingRect.wh, attackingRect.wh);
+            
+        //To make the rects go back to the right of the screen
+        if(attackingRect.x < 0) {
+            attackingRect.x = random(xMax, xMin);
+            attackingRect.speed = random(speedMax, speedMin);
+        } //End of "To make the rects go back to the right of the screen"
+            
+                
+        //To make the rects be able to kill you
+        if(attackingRect.x < 20 && attackingRect.y > mouseY - 10 && attackingRect.y < mouseY + 10) {
+            changeGameStateToEnd();
+                    
+            
+                    
+        } //End of "To make the rects be able to kill you"
+            
+    } //End of "To draw the attacking rects"
+            
+    //So you can move with the arrow keys
+    playerRect.y = mouseY;
+            
+    if (keyIsPressed && keyCode === UP) {
+        playerRect.y = max(playerRect.y - playerRect.speed, 0);
+        mouseY = playerRect.y;
+    }
+        
+    if (keyIsPressed && keyCode === DOWN) {
+        playerRect.y = min(playerRect.y + playerRect.speed, 400);
+        mouseY = playerRect.y;
+    }
+    
+    
+
+};
+var drawEnd = function() {
+    background(255, 255, 255);
+    textSize(30);
+    text("Game over", 128, 65);
+    text("You lasted", 130, 161);
+    text(duration + " seconds", 117, 224);
+            
+    textSize(15);
+    text("Press the restart button or enter below to play again", 34, 90);
+                
+    text("Your " + difficulty + " highscore is " + record[difficulty], 105, 262);
+                
+    if (mouseWasPressedInImpossibleButton === true) {
+        textSize(15);
+        text("I told you it was impossible", 300, 75);    
+    }                    
+    //The Restart button
+    fill(255, 255, 255);
+                
+    if (mouseX > 130 && mouseX < 280 && mouseY > 296 && mouseY < 371 && mouseWasMovedOverRestartButton) {
+        fill(201, 189, 189);
+    }
+                    
+    if (mouseWasPressedInRestartButton && mouseIsPressed && mouseX > 130 && mouseX < 280 && mouseY > 296 && mouseY < 371) {
+        fill(255, 0, 0);
+    }
+    
+    if (keyIsPressed && keyCode === ENTER) {
+        fill(255, 0, 0);
+    }
+    
+
+    rect(130, 296, 150, 75);
+    fill(0, 0, 0);
+    text("Restart", 183, 338); 
+    
+    //The home icon
+    fill(255, 255, 255);
+    if (mouseX > 352 && mouseX < 397 && mouseY > 1 && mouseY < 47 && mouseWasMovedOverHomeButton) {
+        fill(201, 189, 189);
+        
+    }   
+    
+    if (mouseWasPressedInHomeButton && mouseIsPressed && mouseX > 352 && mouseX < 397 && mouseY > 1 && mouseY < 47) {
+        fill(255, 0, 0);
+    }    
+    rect(homeIcon, 0, 47, 47);
+    line(homeIcon + 4, 25, homeIcon + 24, 5);
+    line(homeIcon + 44, 25, homeIcon + 24, 5);
+    line(homeIcon + 17, 11, homeIcon + 17, 4);
+    line(homeIcon + 9, 20, homeIcon + 9, 5);
+    line(homeIcon + 17, 4, homeIcon + 9, 4);
+    line(homeIcon + 8, 43, homeIcon + 8, 21);
+    line(homeIcon + 39, 43, homeIcon + 39, 21);
+    line(homeIcon + 19, 43, homeIcon + 9, 43);
+    line(homeIcon + 20, 43, homeIcon + 20, 28);
+    line(homeIcon + 29, 43, homeIcon + 29, 28);
+    line(homeIcon + 38, 43, homeIcon + 9, 43);
+    line(homeIcon + 20, 28, homeIcon + 29, 28);
+    
+
+
+    fill(0, 0, 0);
+    text(length, textX, 119);
+    
+    if (difficulty === "Impossible"){
+        textSize(12.5);
+        text("I told you it would be impossible", 119, 284);
+    }
+    
+    
+    //Easy
+    if (duration < 5 && difficulty === "Easy") {
+        length = "BRUH. You might litterely be the worst player in the world";
+    }
+    
+    if (duration > 5 && difficulty === "Easy") {
+        length = "You got less than 10 seconds???";
+    }
+    
+    else {
+        length = "";
+        
+    }
+    
+    if (duration > 10 && difficulty === "Easy") {
+        length = "You did a tiny bit good";
+    }
+    
+    if (duration > 15 && difficulty === "Easy") {
+        length = "One fraction better than nothing";
+    }
+    
+    
+    if (duration > 20 && difficulty === "Easy") {
+        length = "You might be good";
+    }
+    
+    
+    
+    if (duration > 25 && difficulty === "Easy") {
+        length = "Good job";
+    }
+   
+    
+    if (duration > 30 && difficulty === "Easy") {
+        length = "Great job";
+    }
+    
+    if (duration > 45 && difficulty === "Easy") {
+        length = "You are kinda good at this";
+    }
+    
+    if (duration > 60 && difficulty === "Easy") {
+        length = "You are doing pretty good";
+    }
+    
+    if (duration > 10000 && difficulty === "Easy") {
+        length = "You're wasting your life right now, unless you cheated";
+
+    }
+    
+    //Medium
+
+    if (duration < 5 && difficulty === "Medium") {
+        length = "You're horrible";
+    }    
+    
+    
+    if (duration > 5 && difficulty === "Medium") {
+        length = "You're not very good";
+    }
+    
+    
+    if (duration > 10 && difficulty === "Medium") {
+        length = "You're a little bit good";
+    }
+    
+    if (duration > 15 && difficulty === "Medium") {
+        length = "You're on your way";
+    }
+    
+    
+    if (duration > 20 && difficulty === "Medium") {
+        length = "You are doing a tiny little bit good";
+    }
+    
+    
+    
+    if (duration > 25 && difficulty === "Medium") {
+        length = "Nice";
+    }
+   
+    
+    if (duration > 30 && difficulty === "Medium") {
+        length = "You're good";
+    }
+    
+    if (duration > 45 && difficulty === "Medium") {
+        length = "Wow";
+    }
+    
+    if (duration > 60 && difficulty === "Medium") {
+        length = "You're insane";
+    }
+    
+    if (duration > 10000 && difficulty === "Medium") {
+        length = "You're wasting your life right now, unless you cheated";
+
+    }
+    
+    //Hard
+    if (duration < 5 && difficulty === "Hard") {
+        length = "I mean hard is pretty hard";
+    }
+    
+    if (duration > 5 && difficulty === "Hard") {
+        length = "Good job";
+    }
+    
+    
+    if (duration > 10 && difficulty === "Hard") {
+        length = "Great job";
+    }
+    
+    if (duration > 15 && difficulty === "Hard") {
+        length = "amazing job";
+    }
+    
+    
+    if (duration > 20 && difficulty === "Hard") {
+        length = "AMAZING JOB";
+    }
+    
+    
+    
+    if (duration > 25 && difficulty === "Hard") {
+        length = "How did you do this?";
+    }
+   
+    
+    if (duration > 30 && difficulty === "hard") {
+        length = "Okay, you're getting kinda good at this";
+    }
+    
+    if (duration > 45 && difficulty === "hard") {
+        length = "You're really good at this";
+    }
+    
+    if (duration > 60 && difficulty === "hard") {
+        length = "I think you might be cheating";
+    }
+    
+    if (duration > 10000 && difficulty === "hard") {
+        length = "You're definitely cheating";
+    }
+    
+    
+    text(difficulty, 180, 31);
+    
+    
+    if (difficulty) {
+        difficult = difficulty + " ";
+    }
+    
+    //Impossible
+    if (duration < 1 && difficulty === "Impossible") {
+        length = "I did tell you that it's impossible (as you see below)";
+    }
+    
+    if (duration > 1 && difficulty === "Impossible") {
+        length = "It's a start";
+    }
+    
+    if (duration > 5 && difficulty === "Impossible") {
+        length = "You are good";
+    }
+    
+    
+    if (duration > 10 && difficulty === "Impossible") {
+        length = "You're insane";
+    }
+    
+    if (duration > 15 && difficulty === "Impossible") {
+        length = "You might be the best in the world";
+    }
+    
+    
+    if (duration > 20 && difficulty === "Impossible") {
+        length = "You're the best in the world";
+    }
+    
+
+    
+    if (duration > 25 && difficulty === "Impossible") {
+        length = "You're better than the best in the world";
+    }
+   
+    
+    if (duration > 30 && difficulty === "Impossible") {
+        length = "You better than the most insane and best person in the world";
+    }
+    
+    if (duration > 45 && difficulty === "Impossible") {
+        length = "You're decent";
+    }
+    
+    if (duration > 60 && difficulty === "Impossible") {
+        length = "You are a god of Dodge the Rects";
+    }
+    
+    if (duration > 10000 && difficulty === "Impossible") {
+        length = "You cheated";
+
+    }
+    
+    
+};
+//So everything gets called every frame
+draw = function() {
+    
+    if (gameState === "start") {    
+        drawStart();
+
+    }  
+    
+    else if (gameState === "play") {
+        drawPlay();    
+    }
+    
+    else if (gameState === "end") {
+        drawEnd();    
+    }
+    
+    
+
+};
+
+
+
+
+
+
+
+
+
